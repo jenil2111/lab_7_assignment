@@ -3,26 +3,30 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JPanel.java to edit this template
  */
 package ui;
-import java.awt.Image;
-import java.io.File;
-import javax.swing.JFileChooser;
+
+import java.util.ArrayList;
 import javax.swing.JOptionPane;
-import model.user;
-import javax.swing.ImageIcon;
+import model.User;
+import javax.swing.table.DefaultTableModel;
+import util.DatabaseConnector;
 
 /**
  *
  * @author Jeel
  */
-public class viewpanel extends javax.swing.JPanel {
+public class ViewPanel extends javax.swing.JPanel {
 
     /**
      * Creates new form viewpanel
      */
-    private user newuser;
-    public viewpanel(user newuser) {
+    private User newuser;
+    private ArrayList<User> users;
+
+    private User selectedUser;
+
+    public ViewPanel(User newuser) {
         initComponents();
-        this.newuser = newuser; 
+        this.newuser = newuser;
         populateData();
     }
 
@@ -41,12 +45,11 @@ public class viewpanel extends javax.swing.JPanel {
         lbl_age = new javax.swing.JLabel();
         txt_fname = new javax.swing.JTextField();
         txt_age = new javax.swing.JTextField();
-        jButton1 = new javax.swing.JButton();
-        jButton2 = new javax.swing.JButton();
-        jButton3 = new javax.swing.JButton();
-        jButton4 = new javax.swing.JButton();
+        savebtn = new javax.swing.JButton();
+        editbtn = new javax.swing.JButton();
+        deletebtn = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
+        userTable = new javax.swing.JTable();
 
         lbl_title.setFont(new java.awt.Font("Cambria", 1, 16)); // NOI18N
         lbl_title.setText("Patient Registration Form");
@@ -67,56 +70,83 @@ public class viewpanel extends javax.swing.JPanel {
             }
         });
 
-        jButton1.setText("Save");
+        savebtn.setText("Save");
+        savebtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                savebtnActionPerformed(evt);
+            }
+        });
 
-        jButton2.setText("Export");
+        editbtn.setText("Edit");
+        editbtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                editbtnActionPerformed(evt);
+            }
+        });
 
-        jButton3.setText("Edit");
+        deletebtn.setText("Delete");
+        deletebtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                deletebtnActionPerformed(evt);
+            }
+        });
 
-        jButton4.setText("Delete");
-
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+        userTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
+                {null, null, null},
+                {null, null, null},
+                {null, null, null},
+                {null, null, null}
             },
             new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
+                "ID", "Name", "Age"
             }
-        ));
-        jScrollPane1.setViewportView(jTable1);
+        ) {
+            Class[] types = new Class [] {
+                java.lang.Object.class, java.lang.String.class, java.lang.Integer.class
+            };
+            boolean[] canEdit = new boolean [] {
+                false, false, false
+            };
+
+            public Class getColumnClass(int columnIndex) {
+                return types [columnIndex];
+            }
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        jScrollPane1.setViewportView(userTable);
+        if (userTable.getColumnModel().getColumnCount() > 0) {
+            userTable.getColumnModel().getColumn(0).setResizable(false);
+            userTable.getColumnModel().getColumn(1).setResizable(false);
+            userTable.getColumnModel().getColumn(2).setResizable(false);
+        }
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGap(27, 27, 27)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(27, 27, 27)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addGroup(layout.createSequentialGroup()
-                                .addGap(112, 112, 112)
-                                .addComponent(lbl_title))
-                            .addGroup(layout.createSequentialGroup()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(lbl_age)
-                                    .addComponent(lbl_fname)
-                                    .addComponent(jButton2))
-                                .addGap(53, 53, 53)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(txt_fname)
-                                    .addComponent(txt_age)
-                                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                        .addGap(11, 11, 11)
-                                        .addComponent(jButton3)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 60, Short.MAX_VALUE)
-                                        .addComponent(jButton4))))))
+                        .addGap(112, 112, 112)
+                        .addComponent(lbl_title))
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(197, 197, 197)
-                        .addComponent(jButton1)))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(lbl_age)
+                            .addComponent(lbl_fname)
+                            .addComponent(editbtn))
+                        .addGap(53, 53, 53)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(savebtn)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 71, Short.MAX_VALUE)
+                                .addComponent(deletebtn))
+                            .addComponent(txt_fname)
+                            .addComponent(txt_age))))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 18, Short.MAX_VALUE)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 344, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(16, 16, 16))
@@ -136,13 +166,11 @@ public class viewpanel extends javax.swing.JPanel {
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(lbl_age)
                             .addComponent(txt_age, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(47, 47, 47)
-                        .addComponent(jButton1)
-                        .addGap(104, 104, 104)
+                        .addGap(56, 56, 56)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jButton2)
-                            .addComponent(jButton3)
-                            .addComponent(jButton4)))
+                            .addComponent(savebtn)
+                            .addComponent(editbtn)
+                            .addComponent(deletebtn)))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(16, 16, 16)
                         .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 319, javax.swing.GroupLayout.PREFERRED_SIZE)))
@@ -158,25 +186,98 @@ public class viewpanel extends javax.swing.JPanel {
 
     }//GEN-LAST:event_txt_ageKeyReleased
 
+    private void savebtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_savebtnActionPerformed
+        // TODO add your handling code here:
+        User newUser = new User();
+        newUser.setName(txt_fname.getText());
+        ViewPanel newViewPanel = new ViewPanel(newUser);
+        
+        try{
+            newUser.setAge(Integer.parseInt(txt_age.getText()));
+            newUser.setName(txt_fname.getText());
+            
+            DatabaseConnector.editUser(selectedUser, newUser);
+            JOptionPane.showMessageDialog(null, "User Edited Successfully", "Successful Edit", JOptionPane.PLAIN_MESSAGE);
+            clearFields();
+            populateData();
+        }
+        catch (Exception e){
+        JOptionPane.showMessageDialog(this, e.getMessage());
+        }
+        
+    }//GEN-LAST:event_savebtnActionPerformed
+
+    private void editbtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editbtnActionPerformed
+        // TODO add your handling code here:
+        int selectedIndex = userTable.getSelectedRow();
+        if (selectedIndex == -1){
+            JOptionPane.showMessageDialog(this, "Please select a user to edit details", "Cannot Edit user details" , JOptionPane.PLAIN_MESSAGE);
+            return;
+        }
+        selectedUser = users.get(selectedIndex);
+        txt_fname.setText(selectedUser.getName());
+        txt_age.setText(Integer.toString(selectedUser.getAge()));
+
+    }//GEN-LAST:event_editbtnActionPerformed
+
+    private void deletebtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deletebtnActionPerformed
+        // TODO add your handling code here:
+         int selectedIndex = userTable.getSelectedRow();
+        if (selectedIndex == -1){
+            JOptionPane.showMessageDialog(this, "Select a user to Delete", "Cannot Delete a user details" , JOptionPane.PLAIN_MESSAGE);
+            return;
+        }
+        
+        try{
+            selectedUser = users.get(selectedIndex);
+            DatabaseConnector.deleteUser(selectedUser);
+            JOptionPane.showMessageDialog(null, "User Deleted Successfully", "Successfuly deleted User", JOptionPane.PLAIN_MESSAGE);
+            clearFields();
+            populateData();
+        }
+        catch (Exception e){
+        JOptionPane.showMessageDialog(this, e.getMessage());
+        }
+    }//GEN-LAST:event_deletebtnActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup buttonGroup1;
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
-    private javax.swing.JButton jButton3;
-    private javax.swing.JButton jButton4;
+    private javax.swing.JButton deletebtn;
+    private javax.swing.JButton editbtn;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTable jTable1;
     private javax.swing.JLabel lbl_age;
     private javax.swing.JLabel lbl_fname;
     private javax.swing.JLabel lbl_title;
+    private javax.swing.JButton savebtn;
     private javax.swing.JTextField txt_age;
     private javax.swing.JTextField txt_fname;
+    private javax.swing.JTable userTable;
     // End of variables declaration//GEN-END:variables
 
-    private void populateData() {
-        txt_fname.setText(this.newuser.getFname());
-        
-        txt_age.setText(this.newuser.getAge());
+    public void populateData() {
+        try {
+            this.users = DatabaseConnector.getAllusers();
+            DefaultTableModel model = (DefaultTableModel) userTable.getModel();
+            model.setRowCount(0);
+            for (User u : users) {
+                Object[] row = new Object[3];
+                row[0] = u.getId();
+//                row[0] = u;
+                row[1] = u.getName();
+                row[2] = u.getAge();
+                model.addRow(row);
+            }
+            clearFields();
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, e.getMessage());
+        }
     }
+
+    private void clearFields() {
+        txt_fname.setText("");
+        txt_age.setText("");
+        selectedUser = null;
+    }
+
 }

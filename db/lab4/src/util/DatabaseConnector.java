@@ -31,7 +31,7 @@ public class DatabaseConnector {
      */
     public static void addUser(User user) {
         //add to database
-        String query = "INSERT INTO USER(NAME,AGE) VALUES(?,?)";
+        String query = "INSERT INTO User(NAME,AGE) VALUES(?,?)";
         try (Connection conn = DriverManager.getConnection(URL, USERNAME, PASSWORD)) {
             PreparedStatement stmt = conn.prepareStatement(query);
             stmt.setString(1, user.getName());
@@ -53,7 +53,7 @@ public class DatabaseConnector {
 //        return list of users from db
         ArrayList<User> users = new ArrayList<>();
 
-        String query = "SELECT * FROM USER";
+        String query = "SELECT * FROM User";
         try (Connection conn = DriverManager.getConnection(URL, USERNAME, PASSWORD)) {
             Statement stmt = conn.createStatement();
             ResultSet rs = stmt.executeQuery(query);
@@ -79,7 +79,7 @@ public class DatabaseConnector {
      * 
      */
     public static void deleteUser(User u) {
-        String query = "delete from USER where id = ?";
+        String query = "delete from User where id = ?";
 
         try (Connection conn = DriverManager.getConnection(URL, USERNAME, PASSWORD)) {
             PreparedStatement stmt = conn.prepareStatement(query);
@@ -96,7 +96,7 @@ public class DatabaseConnector {
      * @param newUser modified user details to be added
      */
     public static void editUser(User oldUser, User newUser) {
-        String query = "UPDATE USER SET name=?, age=? WHERE id=?";
+        String query = "UPDATE User SET name=?, age=? WHERE id=?";
 
         try (Connection conn = DriverManager.getConnection(URL, USERNAME, PASSWORD)) {
             PreparedStatement stmt = conn.prepareStatement(query);
